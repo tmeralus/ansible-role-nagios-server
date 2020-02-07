@@ -15,7 +15,7 @@ Playbook for setting up the Nagios monitoring server and clients (CentOS/RHEL/Fe
      * Generates most of the other configs based on jinja2 templates
      * Wraps Nagios in SSL via Apache
      * Sets up proper firewall rules (firewalld or iptables-services)
-     * This is also available via [Ansible Galaxy](https://galaxy.ansible.com/tmeralus/ansible-role-nagios-server/)
+     * This is also available via [Ansible Galaxy](https://galaxy.ansible.com/tmeralus/nagios_setup)
 
 ## How do I use it?
    - Add your nagios server under `[nagios]` in `hosts` inventory
