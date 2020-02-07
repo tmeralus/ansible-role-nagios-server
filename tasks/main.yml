@@ -1,0 +1,12 @@
+# Playbook to install nagios server, clients and
+# generate service checks based on Ansible inventory
+---
+- tasks:
+  name: Include OS-specific variables.
+    include_vars: "{{ playbook_dir}}/defaults/main.yml"
+  roles:
+    - role: nagios
+    - role: "{ firewall, when: manage_firewall|bool }"
+    - role: instructions
+    - role: nagios_client # role for nagios clients via NRPE
+    - role: "{ firewall_client, when: manage_firewall|bool }"

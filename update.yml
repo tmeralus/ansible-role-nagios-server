@@ -1,0 +1,7 @@
+---
+- hosts: nagios
+  become: yes
+  tasks:
+  - name: Include OS-specific variables.
+    include_vars: "defaults/main.yml"
+  - import_tasks: "roles/nagios/tasks/update.yml"
