@@ -4,7 +4,7 @@ Playbook for setting up the Nagios monitoring server and clients (CentOS/RHEL/Fe
 
 ![Nagios](/image/ansible-nagios.png?raw=true)
 
-[![CI](https://travis-ci.org/sadsfae/ansible-nagios.svg?branch=master)](https://travis-ci.org/sadsfae/ansible-nagios)
+[![CI](https://travis-ci.org/tmeralus/ansible-role-nagios-server.svg?branch=master)](https://travis-ci.org/tmeralus/ansible-role-nagios-server)
 
 ## What does it do?
    - Automated deployment of Nagios Server on CentOS7 or RHEL7
@@ -15,7 +15,7 @@ Playbook for setting up the Nagios monitoring server and clients (CentOS/RHEL/Fe
      * Generates most of the other configs based on jinja2 templates
      * Wraps Nagios in SSL via Apache
      * Sets up proper firewall rules (firewalld or iptables-services)
-     * This is also available via [Ansible Galaxy](https://galaxy.ansible.com/sadsfae/ansible-nagios/)
+     * This is also available via [Ansible Galaxy](https://galaxy.ansible.com/tmeralus/ansible-role-nagios-server/)
 
 ## How do I use it?
    - Add your nagios server under `[nagios]` in `hosts` inventory
@@ -42,7 +42,6 @@ Playbook for setting up the Nagios monitoring server and clients (CentOS/RHEL/Fe
      - Generic out-of-band interfaces *(ping, ssh, http)*
      - Generic Linux servers *(ping, ssh, load, users, procs, uptime, disk space, swap, zombie procs)*
      - Generic Linux servers with MDADM RAID (same as above)
-     - [ELK servers](https://github.com/sadsfae/ansible-elk) *(same as servers plus elasticsearch and Kibana)*
      - Elasticsearch *(same as servers plus TCP/9200 for elasticsearch)*
      - Webservers *(same as servers plus 80/TCP for webserver)*
      - DNS Servers *(same as servers plus UDP/53 for DNS)*
@@ -62,7 +61,7 @@ Playbook for setting up the Nagios monitoring server and clients (CentOS/RHEL/Fe
 ## Nagios Server Instructions
    - Clone repo and setup your Ansible inventory (hosts) file
 ```
-git clone https://github.com/sadsfae/ansible-nagios
+git clone https://github.com/tmeralus/ansible-nagios
 cd ansible-nagios
 sed -i 's/host-01/yournagioshost/' hosts
 ```
@@ -155,12 +154,7 @@ for ipmi in $(cat all_ipmi_2019-10-23); do printf $ipmi ; echo " ansible_host=$(
 ```
 
 Now you can paste `/tmp/add_oobserver` under the `[oobservers]` or `[idrac]` Ansible inventory group respectively.
-
-
-## Demonstration
-   - You can view a video of the Ansible deployment here:
-
-[![Ansible Nagios](http://img.youtube.com/vi/6vfhflwC_Wg/0.jpg)](http://www.youtube.com/watch?v=6vfhflwC_Wg "Deploying Nagios with Ansible")
+ 
 
 ## iDRAC Server Health Details
    - The iDRAC health checks are all optional, you can pick which ones you want to monitor.
