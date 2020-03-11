@@ -5,6 +5,10 @@
 # author: Will Foster (@sadsfae)
 # https://hobo.house/2016/06/24/automate-nagios-deployment-with-ansible/
 
+# Include upper level variables 
+- name: Include OS-specific variables.
+  include_vars: "defaults/main.yml"
+
 - name: Check Operating System
   fail:
     msg="You're not running a supported operating system (CentOS or RHEL 7+)"
@@ -92,16 +96,16 @@
     seuser=system_u
   become: true
 
-- name: Configure SuperMicro IPMI Check
-  copy: src=check_ipmi_sensor dest={{nagios_plugin_path}}/ mode=0755
-  become: true
+#- name: Configure SuperMicro IPMI Check
+#  copy: src=check_ipmi_sensor dest={{nagios_plugin_path}}/ mode=0755
+#  become: true
 
-- name: Generate the SuperMicro monitoring template
-  template: src={{ item + ".j2" }}
-            dest={{supermicro_ipmicfg_path}}/{{ item }}
-  with_items:
-    - ipmi.cfg
-  become: true
+#- name: Generate the SuperMicro monitoring template
+#  template: src={{ item + ".j2" }}
+#            dest={{supermicro_ipmicfg_path}}/{{ item }}
+#  with_items:
+#    - ipmi.cfg
+#  become: true
 
 - name: Generate the nagios conf.d directory
   file:
@@ -109,32 +113,20 @@
     state: directory
 
 - name: Generate the nagios monitoring templates
-#  template: src={{ item + ".j2" }}
-  template:
-    src: "{{ item }}"
-    dest: "/etc/nagios/conf.d/{{ item }}"
-    force: yes
+  template: src={{ item + ".j2" }}
+            dest=/etc/nagios/conf.d/{{ item }}
+            force=yes
   with_items:
-    - sheep.cfg.j2
-#    - "*.j2"
-#    - "{{ playbook_dir}}/roles/nagios/templates/*.j2"
-#    - oobservers.cfg.j2
-#    - switches.cfg.j2
-#    - webservers.cfg.j2
-#    - servers.cfg.j2
-#    - servers_with_mdadm_raid.cfg.j2
+#    - switches.cfg
+#    - webservers.cfg
+#    - servers.cfg
+    - commands.cfg
 #    - commands.cfg.j2
-#    - elkservers.cfg.j2
-#    - elasticsearch.cfg.j2
-#    - idrac.cfg.j2
-#    - supermicro_6018r.cfg.j2
-#    - supermicro_6048r.cfg.j2
-#    - supermicro_1028r.cfg.j2
-#    - jenkins.cfg.j2
-#    - dns.cfg.j2
-#    - dns_with_mdadm_raid.cfg.j2
-#    - freenas.cfg.j2
-#    - devices.cfg.j2
+#    - elkservers.cfg
+#    - elasticsearch.cfg
+#    - jenkins.cfg
+#    - dns.cfg
+#    - devices.cfg
   register: nagios_needs_restart
   become: true
 
@@ -145,20 +137,21 @@
   with_items:
     - contacts.cfg
     - localhost.cfg
+#    - localhost.cfg.j2
   become: true
 
-- name: Generate templated FreeNAS Python status script based on SSL settings
-  template: src={{ item + ".j2" }}
-            dest=/usr/lib64/nagios/plugins/check_freenas.py
-            force=yes
-  with_items:
-    - check_freenas.py
-  become: true
+#- name: Generate templated FreeNAS Python status script based on SSL settings
+#  template: src={{ item + ".j2" }}
+#            dest=/usr/lib64/nagios/plugins/check_freenas.py
+#            force=yes
+#  with_items:
+#    - check_freenas.py
+#  become: true
 
-- name: Make FreeNAS Python status script executable
-  file:
-    dest: /usr/lib64/nagios/plugins/check_freenas.py
-    mode: a+x
+#- name: Make FreeNAS Python status script executable
+#  file:
+#    dest: /usr/lib64/nagios/plugins/check_freenas.py
+#    mode: a+x
 
 - name: Generate the nagios user CGI template
   template: src={{ item + ".j2" }}

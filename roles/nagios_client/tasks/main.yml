@@ -1,10 +1,9 @@
 ---
+# Include upper level variables
+- name: Include OS-specific variables.
+  include_vars: "defaults/main.yml"
+
 # install and setup NRPE and checks
-
-# This task setups the hostname and
-# ip address of nagios master node
-#- import_tasks: "tasks/host-check.yml"
-
 - name: Check Operating System
   fail:
     msg="You're not running a supported operating system (CentOS, RHEL 7+, Fedora or FreeBSD)"

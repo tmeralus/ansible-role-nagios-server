@@ -1,10 +1,8 @@
-ansible-nagios
+ansible-nagios tweaked and inspired by https://github.com/sadsfae
 ==============
 Playbook for setting up the Nagios monitoring server and clients (CentOS/RHEL/Fedora/FreeBSD)
 
 ![Nagios](/image/ansible-nagios.png?raw=true)
-
-[![CI](https://travis-ci.org/tmeralus/ansible-role-nagios-server.svg?branch=master)](https://travis-ci.org/tmeralus/ansible-role-nagios-server)
 
 ## What does it do?
    - Automated deployment of Nagios Server on CentOS7 or RHEL7
@@ -15,12 +13,12 @@ Playbook for setting up the Nagios monitoring server and clients (CentOS/RHEL/Fe
      * Generates most of the other configs based on jinja2 templates
      * Wraps Nagios in SSL via Apache
      * Sets up proper firewall rules (firewalld or iptables-services)
-     * This is also available via [Ansible Galaxy](https://galaxy.ansible.com/tmeralus/nagios_setup)
+     * This is also available via [Ansible Galaxy](https://galaxy.ansible.com/sadsfae/ansible-nagios/)
 
 ## How do I use it?
    - Add your nagios server under `[nagios]` in `hosts` inventory
    - Add respective services/hosts under their inventory group, **hosts can only belong under one group.**
-   - Take a look at `defaults/main.yml` to change anything like email address, nagios user, guest user etc.
+   - Take a look at `install/group_vars/all.yml` to change anything like email address, nagios user, guest user etc.
    - Run the playbook.  Read below for more details if needed.
 
 ## Requirements
@@ -29,20 +27,20 @@ Playbook for setting up the Nagios monitoring server and clients (CentOS/RHEL/Fe
    - If you require SuperMicro server monitoring via IPMI (optional) then do the following
      - Install```perl-IPC-Run``` and ```perl-IO-Tty``` RPMs for RHEL7.
        - I've placed them [here](https://funcamp.net/w/rpm/el7/) if you can't find them, CentOS7 has them however.
-     - Modify ```defaults/main.yml``` to include ```supermicro_enable_checks: true```
+     - Modify ```install/group_vars/all.yml``` to include ```supermicro_enable_checks: true```
 
 ## Notes
    - Sets the ```nagiosadmin``` password to ```changeme```, you'll want to change this.
-   - Creates a read-only user, set ```nagios_create_guest_user: false``` to disable this in ```defaults/main.yml```
-   - You can turn off creation/management of firewall rules via ```defaults/main.yml```
+   - Creates a read-only user, set ```nagios_create_guest_user: false``` to disable this in ```install/group_vars/all.yml```
+   - You can turn off creation/management of firewall rules via ```install/group_vars/all.yml```
    - Adding new hosts to inventory file will just regenerate the Nagios configs
-   - nagios_host_info role is used to gather the nagios master node information and create the ``` nagios_master``` variable 
 
 ## Supported Service Checks
    - Implementation is very simple, with the following resource/service checks generated:
      - Generic out-of-band interfaces *(ping, ssh, http)*
      - Generic Linux servers *(ping, ssh, load, users, procs, uptime, disk space, swap, zombie procs)*
      - Generic Linux servers with MDADM RAID (same as above)
+     - [ELK servers](https://github.com/sadsfae/ansible-elk) *(same as servers plus elasticsearch and Kibana)*
      - Elasticsearch *(same as servers plus TCP/9200 for elasticsearch)*
      - Webservers *(same as servers plus 80/TCP for webserver)*
      - DNS Servers *(same as servers plus UDP/53 for DNS)*
@@ -52,17 +50,17 @@ Playbook for setting up the Nagios monitoring server and clients (CentOS/RHEL/Fe
      - Network switches *(ping, ssh)*
      - IoT and ping-only devices *(ping)*
      - Dell iDRAC server checks via @dangmocrang [check_idrac](https://github.com/dangmocrang/check_idrac)
-       - You can select which checks you want in ```defaults/main.yml```
+       - You can select which checks you want in ```install/group_vars/all.yml```
          - CPU, DISK, VDISK, PS, POWER, TEMP, MEM, FAN
      - SuperMicro server checks via the IPMI interface.
        - CPU, DISK, PS, TEMP, MEM: or anything supported via ```freeipmi``` sensors.
        - *Note: This is **not** the best way to monitor things, SNMP checks are WIP once we purchase licenses for them for our systems
-   - ```contacts.cfg``` notification settings are in ```defaults/main.yml``` and templated for easy modification.
+   - ```contacts.cfg``` notification settings are in ```install/group_vars/all.yml``` and templated for easy modification.
 
 ## Nagios Server Instructions
    - Clone repo and setup your Ansible inventory (hosts) file
 ```
-git clone https://github.com/tmeralus/ansible-nagios
+git clone https://github.com/sadsfae/ansible-nagios
 cd ansible-nagios
 sed -i 's/host-01/yournagioshost/' hosts
 ```
@@ -86,36 +84,24 @@ webserver01-ilo ansible_host=192.168.0.105
 [servers]
 server01
 
-[servers_with_mdadm_raid]
 
 [jenkins]
 jenkins01
 
 [dns]
 
-[dns_with_mdadm_raid]
-
-[idrac]
-database01-idrac ansible_host=192.168.0.106
-
-[supermicro-6048r]
-web01-supermicro-ipmi ansible_host=192.168.0.108
-
-[supermicro-6018r]
-
-[supermicro-1028r]
 
 ```
    - Run the playbook
 ```
-ansible-playbook -i inventory/dev roles/ansible-role-nagios-server/playbook.yml
+ansible-playbook -i hosts install/nagios.yml
 ```
    - Navigate to the server at https://yourhost/nagios
-   - Default login is ```nagiosadmin / changeme``` unless you changed it in ```defaults/main.yml```
+   - Default login is ```nagiosadmin / changeme``` unless you changed it in ```install/group_vars/all.yml```
 
 ## Known Issues
 
-* If you're using a non-root Ansible user you will want to edit ```defaults/main.yml``` setting, e.g. AWS EC2:
+* If you're using a non-root Ansible user you will want to edit ```install/group_vars/all.yml``` setting, e.g. AWS EC2:
 
 ```
 ansible_system_user: ec2-user
@@ -157,6 +143,11 @@ for ipmi in $(cat all_ipmi_2019-10-23); do printf $ipmi ; echo " ansible_host=$(
 Now you can paste `/tmp/add_oobserver` under the `[oobservers]` or `[idrac]` Ansible inventory group respectively.
 
 
+## Demonstration
+   - You can view a video of the Ansible deployment here:
+
+[![Ansible Nagios](http://img.youtube.com/vi/6vfhflwC_Wg/0.jpg)](http://www.youtube.com/watch?v=6vfhflwC_Wg "Deploying Nagios with Ansible")
+
 ## iDRAC Server Health Details
    - The iDRAC health checks are all optional, you can pick which ones you want to monitor.
 
@@ -172,8 +163,8 @@ Now you can paste `/tmp/add_oobserver` under the `[oobservers]` or `[idrac]` Ans
 .
 ├── hosts
 ├── install
-│   ├── defaults
-│   │   └── main.yml
+│   ├── group_vars
+│   │   └── all.yml
 │   ├── nagios.yml
 │   └── roles
 │       ├── firewall
@@ -235,5 +226,6 @@ Now you can paste `/tmp/add_oobserver` under the `[oobservers]` or `[idrac]` Ans
 └── tests
     └── test-requirements.txt
 
+21 directories, 43 files
 
 ```

@@ -10,21 +10,21 @@
 # have python installed.
 
 # role for nagios clients via NRPE
-- hosts: all
-  remote_user: "{{ ansible_system_user }}"
+- hosts: dolly01
+#  remote_user: "{{ ansible_system_user }}"
   tasks:
     - name: Include OS-specific variables.
-      include_vars: "group_vars/all.yml"
+      include_vars: "defaults/main.yml"
   roles:
     - { role: nagios_client }
     - { role: firewall_client, when: manage_firewall_client|bool }
 
 # role for nagios server
 - hosts: nagios
-  remote_user: "{{ ansible_system_user }}"
+#  remote_user: "{{ ansible_system_user }}"
   tasks:
     - name: Include OS-specific variables.
-      include_vars: "group_vars/all.yml"
+      include_vars: "defaults/main.yml"
   roles:
     - { role: nagios }
     - { role: firewall, when: manage_firewall|bool }

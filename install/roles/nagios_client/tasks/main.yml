@@ -1,5 +1,7 @@
 ---
 # install and setup NRPE and checks
+- name: Include OS-specific variables.
+  include_vars: "group_vars/all.yml"
 
 - name: Check Operating System
   fail:
