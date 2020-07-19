@@ -1,4 +1,4 @@
-ansible-nagios tweaked and inspired by https://github.com/sadsfae
+tweaked ansible-nagios playbook inspired by https://github.com/sadsfae
 ==============
 Playbook for setting up the Nagios monitoring server and clients (CentOS/RHEL/Fedora/FreeBSD)
 
